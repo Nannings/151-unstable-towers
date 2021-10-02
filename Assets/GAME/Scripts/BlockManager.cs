@@ -13,6 +13,7 @@ namespace GAME
 
         bool left;
         float speed;
+        bool statered;
 
         public void InitValues()
         {
@@ -22,13 +23,14 @@ namespace GAME
         private void Start()
         {
             InitValues();
-            GetNewBlock();
+            Invoke("GetNewBlock", .5f);
         }
 
         private void GetNewBlock()
         {
             if (currentBlock == null)
             {
+                statered = true;
                 left = false;
                 if (Random.value > .5f)
                 {
@@ -41,12 +43,21 @@ namespace GAME
                 vec.z = 0;
                 newBlock.transform.position = vec;
                 newBlock.GetComponent<SpriteRenderer>().color = colors[Random.Range(0, colors.Length)];
+
+                int[] r = {0, 90, -90, 180};
+                newBlock.transform.rotation = Quaternion.Euler(new Vector3(0,0,r[Random.Range(0, r.Length)]));
+
                 currentBlock = newBlock;
             }
         }
 
         private void Update()
         {
+            if (!statered)
+            {
+                return;
+            }
+
             MoveTopBlock();
 
             DropBlock();
@@ -64,11 +75,13 @@ namespace GAME
                         rigidbody2D.isKinematic = false;
                     }
                     currentBlock = null;
-                    Invoke("GetNewBlock", 2);
+                    Invoke("GetNewBlock", 1);
                 }
                 else if (Input.GetMouseButtonDown(1))
                 {
-                    
+                    Quaternion quaternion = currentBlock.transform.localRotation;
+                    quaternion *= Quaternion.Euler(0, 0, 90);
+                    currentBlock.transform.localRotation = quaternion;
                 }
             }
         }
@@ -81,7 +94,7 @@ namespace GAME
                 {
                     if (currentBlock.transform.position.x < rightSide.position.x)
                     {
-                        currentBlock.transform.Translate(Vector2.right * speed * Time.deltaTime);
+                        currentBlock.transform.Translate(Vector2.right * speed * Time.deltaTime, Space.World);
                     }
                     else
                     {
@@ -92,7 +105,7 @@ namespace GAME
                 {
                     if (currentBlock.transform.position.x > leftSide.position.x)
                     {
-                        currentBlock.transform.Translate(Vector2.left * speed * Time.deltaTime);
+                        currentBlock.transform.Translate(Vector2.left * speed * Time.deltaTime, Space.World);
                     }
                     else
                     {

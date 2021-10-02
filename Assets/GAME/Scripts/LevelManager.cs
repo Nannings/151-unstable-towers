@@ -10,10 +10,13 @@ namespace GAME
     {
         public GameObject best;
         public GameObject psDestroyPrefab;
+        public GameObject panelGamover;
 
         HeightManager heightManager;
         bool restart = false;
+        bool canResart = false;
         BlockManager blockManager;
+        LevelManager levelManager;
 
         private void Awake()
         {
@@ -21,6 +24,7 @@ namespace GAME
             //PlayerPrefs.SetInt("bestScore", 0);
             //PlayerPrefs.SetFloat("bestY", 0);
             heightManager = FindObjectOfType<HeightManager>();
+            levelManager = FindObjectOfType<LevelManager>();
         }
 
         private void Start()
@@ -42,6 +46,17 @@ namespace GAME
         }
 
 
+        private void Update()
+        {
+            if (canResart)
+            {
+                if (Input.anyKeyDown)
+                {
+                    canResart = false;
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                }
+            }
+        }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
@@ -59,13 +74,16 @@ namespace GAME
                             PlayerPrefs.SetFloat("bestY", heightManager.bestY);
                         }
                         print("game over....");
+                        Invoke("Restart2", 1f);
                         Invoke("Restart", 3f);
                         restart = true;
                         blockManager.Stop();
                     }
                     GameObject psDestroy = Instantiate(psDestroyPrefab);
                     Vector3 vec = collision.transform.position;
-                    vec.y = blockManager.transform.position.y - 9f;
+                    Bounds b = Camera.main.OrthographicBounds();
+                    vec.y = b.min.y;
+                    //vec.y = levelManager.transform.position.y + heightManager.score;
                     psDestroy.transform.position = vec;
                     Destroy(collision.gameObject);
                 }
@@ -76,9 +94,15 @@ namespace GAME
             }
         }
 
+        public void Restart2()
+        {
+            FindObjectOfType<CameraController>().goBack = true;
+        }
+
         public void Restart()
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            panelGamover.SetActive(true);
+            canResart = true;
         }
     }
 }
