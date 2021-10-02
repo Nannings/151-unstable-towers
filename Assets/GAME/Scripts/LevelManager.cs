@@ -9,12 +9,15 @@ namespace GAME
     public class LevelManager : MonoBehaviour
     {
         public GameObject best;
+        public GameObject psDestroyPrefab;
 
         HeightManager heightManager;
         bool restart = false;
+        BlockManager blockManager;
 
         private void Awake()
         {
+            blockManager = FindObjectOfType<BlockManager>();
             //PlayerPrefs.SetInt("bestScore", 0);
             //PlayerPrefs.SetFloat("bestY", 0);
             heightManager = FindObjectOfType<HeightManager>();
@@ -42,21 +45,29 @@ namespace GAME
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.CompareTag("Block") && !restart)
+            if (collision.CompareTag("Block"))
             {
                 Rigidbody2D rigidbody2D = collision.GetComponent<Rigidbody2D>();
                 if (rigidbody2D.velocity.magnitude > 1.5f)
                 {
-                    int s = PlayerPrefs.GetInt("bestScore", 0);
-                    if (s < heightManager.score)
+                    if (!restart)
                     {
-                        PlayerPrefs.SetInt("bestScore", heightManager.score);
-                        PlayerPrefs.SetFloat("bestY", heightManager.bestY);
+                        int s = PlayerPrefs.GetInt("bestScore", 0);
+                        if (s < heightManager.score)
+                        {
+                            PlayerPrefs.SetInt("bestScore", heightManager.score);
+                            PlayerPrefs.SetFloat("bestY", heightManager.bestY);
+                        }
+                        print("game over....");
+                        Invoke("Restart", 3f);
+                        restart = true;
+                        blockManager.Stop();
                     }
-                    print("game over....");
-                    Invoke("Restart", 3f);
-                    restart = true;
-                    FindObjectOfType<BlockManager>().Stop();
+                    GameObject psDestroy = Instantiate(psDestroyPrefab);
+                    Vector3 vec = collision.transform.position;
+                    vec.y = blockManager.transform.position.y - 9f;
+                    psDestroy.transform.position = vec;
+                    Destroy(collision.gameObject);
                 }
                 else
                 {
