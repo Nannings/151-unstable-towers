@@ -11,6 +11,7 @@ namespace GAME
         public GameObject best;
         public GameObject psDestroyPrefab;
         public GameObject panelGamover;
+        public Text bestHeight;
 
         HeightManager heightManager;
         bool restart = false;
@@ -29,6 +30,8 @@ namespace GAME
 
         private void Start()
         {
+            bestHeight.text = "";
+
             int s = PlayerPrefs.GetInt("bestScore", 0);
             if (s <= 0)
             {
@@ -42,6 +45,8 @@ namespace GAME
                 Vector3 pos = best.transform.position;
                 pos.y = y;
                 best.transform.position = pos;
+
+                bestHeight.text = "your best height: " + s;
             }
         }
 
@@ -72,6 +77,8 @@ namespace GAME
                         {
                             PlayerPrefs.SetInt("bestScore", heightManager.score);
                             PlayerPrefs.SetFloat("bestY", heightManager.bestY);
+
+                            bestHeight.text = "new best height!: " + heightManager.score;
                         }
                         print("game over....");
                         Invoke("Restart2", 1f);

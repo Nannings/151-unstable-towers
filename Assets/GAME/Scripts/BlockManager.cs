@@ -10,6 +10,7 @@ namespace GAME
         public GameObject currentBlock;
         public Transform leftSide, rightSide;
         public Color[] colors;
+        public AudioSource audioSource;
 
         bool left;
         float speed;
@@ -48,6 +49,11 @@ namespace GAME
                 newBlock.transform.rotation = Quaternion.Euler(new Vector3(0,0,r[Random.Range(0, r.Length)]));
 
                 currentBlock = newBlock;
+
+                if (!audioSource.isPlaying)
+                {
+                    audioSource.Play();
+                }
             }
         }
 
@@ -67,7 +73,10 @@ namespace GAME
         {
             if (currentBlock != null)
             {
-                if (Input.GetKeyDown(KeyCode.Space)|| Input.GetMouseButtonDown(0))
+                if (Input.GetKeyDown(KeyCode.Space) || 
+                    Input.GetMouseButtonDown(0) ||
+                    Input.GetKeyDown(KeyCode.DownArrow) ||
+                    Input.GetKeyDown(KeyCode.S))
                 {
                     Rigidbody2D rigidbody2D = currentBlock.GetComponent<Rigidbody2D>();
                     if (rigidbody2D)
@@ -77,10 +86,16 @@ namespace GAME
                     currentBlock = null;
                     Invoke("GetNewBlock", 1);
                 }
-                else if (Input.GetMouseButtonDown(1))
+                else if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
                 {
                     Quaternion quaternion = currentBlock.transform.localRotation;
                     quaternion *= Quaternion.Euler(0, 0, 90);
+                    currentBlock.transform.localRotation = quaternion;
+                }
+                else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+                {
+                    Quaternion quaternion = currentBlock.transform.localRotation;
+                    quaternion *= Quaternion.Euler(0, 0, -90);
                     currentBlock.transform.localRotation = quaternion;
                 }
             }
