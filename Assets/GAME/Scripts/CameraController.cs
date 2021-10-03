@@ -29,7 +29,7 @@ namespace GAME
 
             Vector3 tempPos = transform.position;
             //tempPos.y = toFollow.transform.position.y + 2 - startSize / 4;
-            tempPos.y = toFollow.transform.position.y + 2;
+            tempPos.y = toFollow.transform.position.y + 1;
             if (transform.position.y < tempPos.y)
             {
                 //if (Camera.main.orthographicSize < 8)
